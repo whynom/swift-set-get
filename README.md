@@ -30,3 +30,83 @@ Well lookie here.  Either way I make a money struct, whether I use a computed va
 
 ## But wait, computed variables have a `get` and `set`
 The previous example of a computed property is actually what the swift book refers to as a _read only_ computed property, which will hopefully make sense after going through the following example I lifted from the  [swift book](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/properties/#Computed-Properties)
+
+## The Rectangle
+In this example, we're going to make a rectangle.  We'll give it an `origin` and a `size`, and it will give us a center.  For us to define an origin, we need a point.
+
+## Let's get to the point
+Here's how we'll define a point, like the one you used to see in math class on a cartesian plane.
+
+``` swift
+struct Point {
+    var x = 0.0, y = 0.0
+}
+```
+
+Give me an `x` and a `y` and I'll give you a `Point`.
+
+## Size
+Give me a `width` and `height`, and I'll give you the `Size` of a rectangle.
+
+``` swift
+struct Size {
+    var width = 0.0, height = 0.0
+}
+```
+
+## Point and Sizes lead to the Rectangle
+Finally,
+
+``` swift
+struct Rect {
+    var origin = Point()
+    var size = Size()
+    var center: Point {
+        get {
+            let centerX = origin.x + (size.width / 2)
+            let centerY = origin.y + (size.height / 2)
+            return Point(x: centerX, y: centerY)
+        }
+        set(newCenter) {
+            origin.x = newCenter.x - (size.width / 2)
+            origin.y = newCenter.y - (size.height / 2)
+        }
+    }
+}
+```
+
+Here we see our `get` and `set` keywords in action.  Once we've made a `Rect` we get computations on our `origin` and `size` that give us the center.
+
+## Accessing the `center`
+Whenever we access the center, it'll run the code block in the curly braces following the `get` keyword.  Let's _test_ this theory.
+
+``` swift
+    @Test func getSetTests() async throws {
+        var square = Rect(origin: Point(x: 0.0, y: 0.0),
+                          size: Size(width: 10.0, height: 10.0))
+        #expect(square.center.x == 5)
+        #expect(square.center.y == 5)
+        }
+```
+
+When we're accessing the `center`, which we didn't define upon making the `Rect`, it runs that code block after the `get` key word and returns to us a `Point` with a center that has an x at 5, and a y at 5.
+
+## Setting the `center`
+Now we're going to tell our `Rect` instance what the new center is, and it's going to execute the code block after the `set` keyword to change the `center` of our rectangle and make a new rectangle from which we can give the new `origin`
+
+
+``` swift
+    @Test func getSetTests() async throws {
+       ...
+       
+        square.center = Point(x: 15.0, y: 15.0)
+        #expect(square.origin.x == 10)
+        #expect(square.origin.y == 10)
+    }
+
+```
+
+When we set that `center` property, the code block after `set` in our `Rect` is executed and it returns to us the new `origin`.
+
+## Final thoughts
+This is pretty basic stuff but I feel like going through it step by step, making tests, writing everything out gives me a better and more solid understanding.  Computed variables aren't just syntactic sugar for a function, they're their own _thing_.  The `set` and the `get` make them unique and different from a function, and knowing that gives me another tool to use if I should ever run into something that needs the unique use of the the `get` `set` on a computed variable.
