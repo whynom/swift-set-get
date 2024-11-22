@@ -9,8 +9,22 @@ import Testing
 
 struct set_getTests {
 
-    @Test func example() async throws {
-        // Write your test here and use APIs like `#expect(...)` to check expected conditions.
+    @Test func computedVariablesAreFunctions() async throws {
+        struct Money {
+            var cents: Double
+            var dollars: Double {
+                cents / 100
+            }
+        }
+        
+        struct MoneyWithAFunction {
+            var cents: Double
+            func dollars() -> Double {
+               cents / 100
+            }
+        }
+        
+        #expect(Money(cents: 233).dollars == MoneyWithAFunction(cents: 233).dollars())
     }
 
 }
